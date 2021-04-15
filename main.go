@@ -14,12 +14,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var version = "dev" // Set by build process
+
 // Flags
 var opts struct {
-	IPs    bool   `short:"i" long:"ips" description:"Match IP addresses"`
-	IPv4   bool   `short:"4" long:"ipv4" description:"Match IPv4 addresses"`
-	IPv6   bool   `short:"6" long:"ipv6" description:"Match IPv6 addresses"`
-	Action string `short:"a" long:"action" description:"\"replace\" to replace with dummy values, \"remove\" to replace with asterisks"`
+	IPs         bool   `short:"i" long:"ips" description:"Match IP addresses"`
+	IPv4        bool   `short:"4" long:"ipv4" description:"Match IPv4 addresses"`
+	IPv6        bool   `short:"6" long:"ipv6" description:"Match IPv6 addresses"`
+	Action      string `short:"a" long:"action" description:"\"replace\" to replace with dummy values, \"remove\" to replace with asterisks"`
+	ShowVersion bool   `short:"V" long:"version" description:"Show version and exit"`
 }
 
 var (
@@ -72,6 +75,11 @@ func main() {
 			log.Fatal(err)
 		}
 		os.Exit(1)
+	}
+
+	if opts.ShowVersion {
+		log.Infof("logknife version %s https://github.com/natesales/logkife", version)
+		os.Exit(0)
 	}
 
 	// Validate action flag
