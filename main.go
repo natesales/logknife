@@ -16,9 +16,10 @@ import (
 
 // Flags
 var opts struct {
-	IPs  bool `long:"ips" description:"Match IP addresses"`
-	IPv4 bool `long:"ipv4" description:"Match IPv4 addresses"`
-	IPv6 bool `long:"ipv6" description:"Match IPv6 addresses"`
+	IPs    bool   `short:"i" long:"ips" description:"Match IP addresses"`
+	IPv4   bool   `short:"4" long:"ipv4" description:"Match IPv4 addresses"`
+	IPv6   bool   `short:"6" long:"ipv6" description:"Match IPv6 addresses"`
+	Action string `short:"a" long:"action" description:"\"replace\" to replace with dummy values, \"remove\" to replace with asterisks"`
 }
 
 var (
@@ -73,6 +74,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Validate action flag
+	if !(opts.Action == "replace" || opts.Action == "remove") {
+		log.Fatal("--action must be \"replace\" or \"remove\"")
+	}
+
 	// Set filters to apply
 	configuredFilters := map[string]bool{}
 	if opts.IPv4 {
@@ -100,7 +106,15 @@ func main() {
 		modified := string(input)
 		for filter := range configuredFilters {
 			for _, entry := range regexp.MustCompile(filter).FindAllString(modified, -1) {
-				modified = strings.Replace(modified, entry, getInternalIP(entry), -1)
+				var replacement string
+				if opts.Action == "remove" {
+					replacement = "******"
+				} else if opts.Action == "replace" {
+					replacement = getInternalIP(entry)
+				} else {
+					log.Fatal("Unknown action")
+				}
+				modified = strings.Replace(modified, entry, replacement, -1)
 			}
 		}
 
