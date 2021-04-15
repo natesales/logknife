@@ -9,18 +9,22 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/jessevdk/go-flags"
+	log "github.com/sirupsen/logrus"
 )
+
+// Flags
+var opts struct {
+	IPs  bool `long:"ips" description:"Match IP addresses"`
+	IPv4 bool `long:"ipv4" description:"Match IPv4 addresses"`
+	IPv6 bool `long:"ipv6" description:"Match IPv6 addresses"`
+}
 
 var (
 	regexIPv4 = `(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)`
 	regexIPv6 = `(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))`
 )
-
-// filters maps a string to a regex
-var filters = map[string]string{
-	"ipv4": regexIPv4,
-	"ipv6": regexIPv6,
-}
 
 var ipMap = map[string]string{}
 
@@ -60,8 +64,32 @@ func getInternalIP(ip string) string {
 }
 
 func main() {
+	// Parse cli flags
+	_, err := flags.ParseArgs(&opts, os.Args)
+	if err != nil {
+		if !strings.Contains(err.Error(), "Usage") {
+			log.Fatal(err)
+		}
+		os.Exit(1)
+	}
+
+	// Set filters to apply
+	configuredFilters := map[string]bool{}
+	if opts.IPv4 {
+		configuredFilters[regexIPv4] = true
+	}
+	if opts.IPv6 {
+		configuredFilters[regexIPv6] = true
+	}
+	if opts.IPs {
+		configuredFilters[regexIPv4] = true
+		configuredFilters[regexIPv6] = true
+	}
+
+	// Open buffered stdin reader
 	reader := bufio.NewReader(os.Stdin)
 
+	// Loop over stdin lines
 	for {
 		input, _, err := reader.ReadLine()
 		if err != nil && err == io.EOF {
@@ -70,8 +98,8 @@ func main() {
 
 		// Apply replacements for each defined filter
 		modified := string(input)
-		for _, f := range []string{"ipv4", "ipv6"} {
-			for _, entry := range regexp.MustCompile(filters[f]).FindAllString(modified, -1) {
+		for filter := range configuredFilters {
+			for _, entry := range regexp.MustCompile(filter).FindAllString(modified, -1) {
 				modified = strings.Replace(modified, entry, getInternalIP(entry), -1)
 			}
 		}
