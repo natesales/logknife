@@ -57,7 +57,7 @@ func getInternalIP(ip string) string {
 			number := uint8(rand.Intn(255))
 			newIp = append(newIp, number)
 		}
-		ipMap[ip] = newIp.String()
+		ipMap[ip] = newIp.String()[:len(newIp.String())-1]
 	}
 
 	return ipMap[ip]
