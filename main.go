@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+var filters map[string]string = {"": ""}
+
 func replace(replacement string, pattern string) string {
      return regexp.MustCompile(pattern).ReplaceAllString(replacement)
 }
