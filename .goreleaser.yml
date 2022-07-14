@@ -6,19 +6,36 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
-      - freebsd
       - darwin
+      - freebsd
       - windows
     goarch:
       - amd64
       - arm64
+scoop:
+  name: logknife
+  commit_author:
+    name: natesales
+    email: nate@natesales.net
+  commit_msg_template: Scoop update for {{ .ProjectName }} version {{ .Tag }}
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
 nfpms:
   - id: nfpm-default
     package_name: logknife
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     vendor: Nate Sales
     homepage: https://natesales.net/
     maintainer: Nate Sales <nate@natesales.net>
-    description: Remove sensitive information from logs
+    description: Remove sensitive data from logs
     license: GNU GPL-3.0
     section: utils
     priority: extra
@@ -31,3 +48,9 @@ publishers:
       - nfpm-default
     dir: "{{ dir .ArtifactPath }}"
     cmd: curl -s -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/natesales/
+brews:
+  - name: logknife
+    homepage: https://github.com/natesales/repo
+    tap:
+      owner: natesales
+      name: repo
