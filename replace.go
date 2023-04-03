@@ -13,42 +13,42 @@ var (
 	uuids = map[string]string{}
 )
 
-func randIPv4() string {
-	return fmt.Sprintf("10.%d.%d.%d", rand.Intn(255), rand.Intn(255), rand.Intn(255))
+func randIPv4(rng *rand.Rand) string {
+	return fmt.Sprintf("10.%d.%d.%d", rng.Intn(255), rng.Intn(255), rng.Intn(255))
 }
 
-func randHex(length int) string {
+func randHex(length int, rng *rand.Rand) string {
 	var newHex string
 	for i := 0; i < length; i++ {
-		newHex += fmt.Sprintf("%x", rand.Intn(16))
+		newHex += fmt.Sprintf("%x", rng.Intn(16))
 	}
 	return newHex
 }
 
-func randIPv6() string {
-	return fmt.Sprintf("2001:db8:%s:%s::", randHex(4), randHex(4))
+func randIPv6(rng *rand.Rand) string {
+	return fmt.Sprintf("2001:db8:%s:%s::", randHex(4, rng), randHex(4, rng))
 }
 
 // ReplaceIP takes the true IP and returns a persistent mapping to an internal IP
-func ReplaceIP(ip string) string {
+func ReplaceIP(ip string, rng *rand.Rand) string {
 	if _, ok := ips[ip]; !ok {
 		if strings.Contains(ip, ".") { // If IPv4
-			rIP := randIPv4()
+			rIP := randIPv4(rng)
 			for {
 				if _, ok := ips[rIP]; !ok {
 					ips[ip] = rIP
 					break
 				}
-				rIP = randIPv4()
+				rIP = randIPv4(rng)
 			}
 		} else { // If IPv6
-			rIP := randIPv6()
+			rIP := randIPv6(rng)
 			for {
 				if _, ok := ips[rIP]; !ok {
 					ips[ip] = rIP
 					break
 				}
-				rIP = randIPv6()
+				rIP = randIPv6(rng)
 			}
 		}
 	}
