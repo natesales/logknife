@@ -1,4 +1,4 @@
-package main
+package logknife
 
 import (
 	"fmt"

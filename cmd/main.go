@@ -7,6 +7,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+
+	"github.com/natesales/logknife"
 )
 
 var version = "dev" // Set by build process
@@ -66,7 +68,7 @@ var rootCmd = &cobra.Command{
 			}
 			r = f
 		}
-		Knife(r, !noIPs, !noUUIDs)
+		logknife.Knife(r, redact, !noIPs, !noUUIDs, redactionPattern)
 	},
 }
 

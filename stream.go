@@ -1,4 +1,4 @@
-package main
+package logknife
 
 import (
 	"bufio"
@@ -12,7 +12,7 @@ import (
 )
 
 // Knife reads from a reader and prints to stdout
-func Knife(r io.Reader, ips, uuids bool) {
+func Knife(r io.Reader, redact, ips, uuids bool, redactionPattern string) {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	reader := bufio.NewReader(r)
