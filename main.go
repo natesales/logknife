@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
-	"strings"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -49,14 +45,15 @@ var rootCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
+		var file string
 		if len(args) == 0 {
-			log.Fatal("No input file specified, use - for stdin")
+			log.Debugf("No input file specified, using - for stdin")
+			file = "-"
+		} else {
+			file = args[0]
 		}
-		file := args[0]
 
 		log.Debugf("Redact: %s, IPs: %v, UUIDs: %v, File: %s", redact, !noUUIDs, !noUUIDs, file)
-
-		rand.Seed(time.Now().UnixNano())
 
 		// Open input file
 		var r io.Reader
