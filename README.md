@@ -16,7 +16,7 @@ Remove sensitive information from your logs.
 $ echo "12345678-1234-4321-b321-7e3fe946f781 1.1.1.1 2606:4700:4700::1111" | logknife -
 8ac8d0fc-4f7e-4969-8d5b-6f5f4e116b37 10.39.213.116 2001:db8:bb14:9f27::1111
 
-$ logknife --redact test.txt                                                                                                                                             130 ↵ nate@altair
+$ logknife --redact test.txt
 logknife is a log redactor.
 It uses regex to substitute sensitive data with an innocuous replacement or a redaction message.
 IP addresses: ******** and ********
