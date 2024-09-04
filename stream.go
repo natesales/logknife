@@ -2,7 +2,6 @@ package logknife
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"math/rand"
 	"strings"
@@ -12,7 +11,7 @@ import (
 )
 
 // Knife reads from a reader and prints to stdout
-func Knife(r io.Reader, redact, ips, uuids bool, redactionPattern string) {
+func Knife(r io.Reader, w io.Writer, redact, ips, uuids bool, redactionPattern string) {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	reader := bufio.NewReader(r)
@@ -48,6 +47,6 @@ func Knife(r io.Reader, redact, ips, uuids bool, redactionPattern string) {
 			}
 		}
 
-		fmt.Println(modified)
+		_, _ = w.Write([]byte(modified + "\n"))
 	}
 }

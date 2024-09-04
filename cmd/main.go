@@ -68,7 +68,7 @@ var rootCmd = &cobra.Command{
 			}
 			r = f
 		}
-		logknife.Knife(r, redact, !noIPs, !noUUIDs, redactionPattern)
+		logknife.Knife(r, os.Stdout, redact, !noIPs, !noUUIDs, redactionPattern)
 	},
 }
 
